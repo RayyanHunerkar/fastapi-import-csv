@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas import  DataFrame
 
 from fastapi import FastAPI, UploadFile
 from starlette import status
@@ -8,19 +9,15 @@ app = FastAPI()
 db = []
 
 
-@app.post('/', status_code=status.HTTP_201_CREATED)
-async def import_csv(file: UploadFile) -> dict:
-
-    data = pd.read_csv(file.file)
-    file.file.close()
-    data['ID'].fillna(method='ffill', inplace=True)
+async def get_ids(data: DataFrame) -> list:
     ids = []
     for i in range(len(data["ID"])):
         if data.iloc[i]["ID"] != data.iloc[i-1]["ID"]:
             ids.append(data.loc[i]["ID"])
+    return ids
 
 
-
+async def get_data(data: DataFrame, ids: list) -> list:
     for j in range(len(ids)):
         soft_skills = []
         summary = []
@@ -48,6 +45,18 @@ async def import_csv(file: UploadFile) -> dict:
                 "summary": summary
             }
         db.append(json)
+        return db
+
+
+@app.post('/', status_code=status.HTTP_201_CREATED)
+async def import_csv(file: UploadFile) -> dict:
+
+    data = pd.read_csv(file.file)
+    file.file.close()
+    data['ID'].fillna(method='ffill', inplace=True)
+    ids = await get_ids(data)
+
+    db = await get_data(data, ids)
 
     return {
         "data": db,

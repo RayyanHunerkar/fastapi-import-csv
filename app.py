@@ -44,7 +44,7 @@ async def get_data(data: DataFrame, ids: list) -> list:
                 "summary": summary
             }
         db.append(json)
-        return db
+    return db
 
 
 @app.post('/', status_code=status.HTTP_201_CREATED)
@@ -53,9 +53,10 @@ async def import_csv(file: UploadFile) -> dict:
     file.file.close()
     data['ID'].fillna(method='ffill', inplace=True)
     ids = await get_ids(data)
+    print(ids)
     db = await get_data(data, ids)
     return {
         "data": db,
-        "message": "data imported succesfully",
+        "message": "data imported successfully",
         "status": 200
     }

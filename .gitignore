@@ -127,8 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-<<<<<<< HEAD
-=======
 
 .vscode/
->>>>>>> fd1c16a (init commit)

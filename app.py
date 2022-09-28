@@ -1,7 +1,6 @@
 import pandas as pd
-from pandas import  DataFrame
-
 from fastapi import FastAPI, UploadFile
+from pandas import DataFrame
 from starlette import status
 
 app = FastAPI()
@@ -12,7 +11,7 @@ db = []
 async def get_ids(data: DataFrame) -> list:
     ids = []
     for i in range(len(data["ID"])):
-        if data.iloc[i]["ID"] != data.iloc[i-1]["ID"]:
+        if data.iloc[i]["ID"] != data.iloc[i - 1]["ID"]:
             ids.append(data.loc[i]["ID"])
     return ids
 
@@ -23,7 +22,7 @@ async def get_data(data: DataFrame, ids: list) -> list:
         summary = []
         technical_skills = []
         for i in range(len(data)):
-            if data.loc[i]['ID'] == j+1:
+            if data.loc[i]['ID'] == j + 1:
                 if not pd.isna(data.loc[i]['Soft Skills']):
                     soft_skills.append(data.loc[i]['Soft Skills'])
                 if not pd.isna(data.loc[i]['Summary']):
@@ -50,14 +49,11 @@ async def get_data(data: DataFrame, ids: list) -> list:
 
 @app.post('/', status_code=status.HTTP_201_CREATED)
 async def import_csv(file: UploadFile) -> dict:
-
     data = pd.read_csv(file.file)
     file.file.close()
     data['ID'].fillna(method='ffill', inplace=True)
     ids = await get_ids(data)
-
     db = await get_data(data, ids)
-
     return {
         "data": db,
         "message": "data imported succesfully",

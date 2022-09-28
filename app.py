@@ -2,6 +2,7 @@ import pandas as pd
 
 from fastapi import FastAPI, UploadFile
 from starlette import status
+
 app = FastAPI()
 
 db = []
@@ -18,11 +19,12 @@ async def import_csv(file: UploadFile) -> dict:
         if data.iloc[i]["ID"] != data.iloc[i-1]["ID"]:
             ids.append(data.loc[i]["ID"])
 
-    soft_skills = []
-    summary = []
-    technical_skills = []
+
 
     for j in range(len(ids)):
+        soft_skills = []
+        summary = []
+        technical_skills = []
         for i in range(len(data)):
             if data.loc[i]['ID'] == j+1:
                 if not pd.isna(data.loc[i]['Soft Skills']):
